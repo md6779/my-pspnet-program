@@ -26,7 +26,7 @@ def jpg_to_mp4(dir_path_1,  name1):
 
     out_1 = cv2.VideoWriter(name1, 
                         cv2.VideoWriter_fourcc(*"mp4v"),
-                        5.0, size)
+                        30.0, size)
 
     for jpg_img in jpg_imgs:
         out_1.write(jpg_img)

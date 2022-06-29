@@ -1,0 +1,126 @@
+
+train_parameter:
+
+path:
+  root: E:/senkouka/data_dataset_voc
+  save_root: exp/
+  checkpoint_save_dir: ckpt
+data:
+  train_list: "C:/Users/\u5317\u98A8\u88D5\u6559/semseg-pspnet/list/train_list.txt"
+  valid_list: "C:/Users/\u5317\u98A8\u88D5\u6559/semseg-pspnet/list/valid_list.txt"
+network:
+  layers: 50
+  width: 473
+  height: 473
+  batch_size: 16
+  subdivisions: 8
+  workers: 1
+
+list_txt_file_format:
+
+save as utf-8 
+not utf-8(BOM)
+
+train_data:
+
+look at mIoU
+closer to 1 the better
+mAcc (percentage)
+
+train_1_progress:
+
+Epoch[5/30]
+
+loss    mIoU    mAcc    allAcc
+==============================
+0.212   0.623   0.695    0.944
+
+model_5.pth saved.
+
+Epoch[10/30]
+
+loss    mIoU    mAcc    allAcc
+==============================
+0.151   0.700   0.766    0.958
+
+model_10.pth saved.
+
+Epoch[15/30]
+
+loss    mIoU    mAcc    allAcc
+==============================
+0.127   0.733   0.794    0.964
+
+model_15.pth saved.
+
+
+Epoch[20/30]
+
+loss    mIoU    mAcc    allAcc
+==============================
+0.112   0.752   0.811    0.968
+
+model_20.pth saved.
+
+Epoch[25/30]
+
+loss    mIoU    mAcc    allAcc
+==============================
+0.102   0.766   0.823    0.970
+
+model_25.pth saved.
+
+Epoch[30/30]
+
+loss    mIoU    mAcc    allAcc
+==============================
+0.095   0.776   0.832    0.972
+
+model_30.pth saved.
+
+test_result:
+
+test_result_graph:C:\Users\北風裕教\semseg-pspnet> tensorboard --logdir exp
+
+背景と陸は認識されたが，求められている帯状の海洋ごみは全く認識されていなかった。
+
+Testing... model_10.pth
+
+mIoU    mAcc    allAcc
+======================
+0.558   0.611    0.955
+
+  Class       iou    accuracy
+=============================
+background   0.953      0.986
+land         0.721      0.845
+debris       0.000      0.000
+
+Testing... model_15.pth
+
+mIoU    mAcc    allAcc
+======================
+0.544   0.614    0.950
+
+  Class       iou    accuracy
+=============================
+background   0.947      0.979
+land         0.684      0.863
+debris       0.000      0.000
+
+やることリスト：
+
+〇保存された重みファイルをロード
+
+〇それに対して、画像入力をして、出力をとる
+
+〇使う画像に関しては、映像から切り出した画像
+
+〇映像をプログラムに渡して、プログラム内部で画像化させていく
+
+〇出力はウィンドウで出力して、映像の形にする
+
+【最終的の目標】
+
+×最終的に、3つの処理を並列に実行できるようにする
+

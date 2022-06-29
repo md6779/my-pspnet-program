@@ -16,12 +16,12 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import functional as F
 from torchvision import transforms
 from tqdm import tqdm
-from config import Config
+#from config import Config
 from model.pspnet import PSPNet
-from utils import dataset, trans
+from utils import trans
 from pathlib import Path
-from utils import mp4_to_jpg
-from utils import jpg_to_mp4
+import mp4_to_jpg
+import jpg_to_mp4
 # from torchvideotransforms import video_transforms, volume_transforms
 from threading import Thread
 
@@ -61,7 +61,7 @@ def img_data(path):
     return img
 
 def pspnet_load(ckpt_path):
-    ckpt_path = r"E:\senkouka\semseg-pspnet\exp\2022-06-14_09h52m13s\ckpt\model_30.pth"
+    ckpt_path = r"D:\senkouka\semseg-pspnet\exp\2022-06-14_09h52m13s\ckpt\model_30.pth"
     classes_name =  ["background", "land", "debris"]
     name = "output"
     model = PSPNet(
@@ -99,7 +99,7 @@ def img_pspnet_eval(img_path):
 def main():
     img_path = Path("E:/senkouka/result_4")
     output_path = Path("E:/senkouka/output_1")
-    ckpt_path = r"E:\senkouka\semseg-pspnet\exp\2022-06-14_09h52m13s\ckpt\model_30.pth"
+    #ckpt_path = r"E:\senkouka\semseg-pspnet\exp\2022-06-14_09h52m13s\ckpt\model_30.pth"
     
     if not output_path.exists():
         output_path.mkdir(parents=True)
@@ -107,7 +107,7 @@ def main():
     classes_name =  ["background", "land", "debris"]
     name = "output"
 #　PSPNetの重みを呼び出す
-    pspnet_load(ckpt_path)
+    pspnet_load(pspnet_load.ckpt_path)
     img_pspnet_eval(img_path)
 # パレット
     palette =  [
@@ -144,12 +144,10 @@ def main():
     
 
 if __name__ == "__main__":
-    global dir_path, alpha_filename
+#alpha_path = "E:/senkouka/output_1"
+#alpha_filename = "E:/senkouka/output_1/alphapng.mp4"
 
-    alpha_path = "E:/senkouka/output_1"
-    alpha_filename = "E:/senkouka/output_1/alphapng.mp4"
-
-    mp4_to_jpg.main()
+#    mp4_to_jpg.main()
     main()
 
 #    vid_path = "E:/senkouka/drone_flight_0967.MP4"
