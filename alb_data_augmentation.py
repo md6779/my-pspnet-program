@@ -1,24 +1,7 @@
-from importlib.resources import path
-import os
-import glob
 from typing import get_type_hints
 from regex import P
-import torch
-import torch.cuda
 import numpy as np 
 import cv2
-import utils
-import os
-from datetime import datetime
-import sys
-#from (root directory) import (py file)
-import PIL
-from PIL import Image
-from torch.backends import cudnn
-from torch.utils.data import DataLoader
-from torchvision.transforms import functional as F
-from torchvision import transforms as T
-from torchvision import datasets as D
 from torchvision.utils import save_image
 import albumentations as A
 from tqdm import tqdm
@@ -27,17 +10,6 @@ from model.pspnet import PSPNet
 from utils import trans
 from pathlib import Path
 import random 
-
-def read_imgs():
-
-    imgs = cv2.imread("")
-    imgs = cv2.cvtColor(imgs, cv2.COLOR_BGR2RGBA)
-
-def read_masks():
-    mask_1 = cv2.imread("")
-    mask_2 = cv2.imread("")
-    mask_3 = cv2.imread("")
-    masks = [mask_1, mask_2, mask_3]
 
 def img_transform():
 
@@ -51,12 +23,15 @@ def img_transform():
     always_apply = False
     blur_limit = (3, 9)
     sigma_limit = 0
-    fog_coef = (lower, upper) = (0.3, 1.0)
+    fog_coef = (lower, upper) = (0.3, 0.9)
     alpha_coef = 0.1
 
-    transform = A.Compose(
+    imgs_masks_transform = A.Compose(
         A.RandomCrop(size),
-        A.HorizontalFlip(P),
+        A.HorizontalFlip(P),      
+    )
+    
+    imgs_transform = A.Compose(
         A.RandomBrightnessContrast(P),
         A.GaussianBlur(blur_limit, sigma_limit, P),
         A.GaussNoise(
@@ -66,10 +41,121 @@ def img_transform():
         A.RandomFog(fog_coef, alpha_coef, always_apply, P)
     )
 
-    transformed_1 = transform(imgs=read_imgs.imgs, 
-    mask= read_masks.masks)[""]
-    transformed_2 = transform(imgs=read_imgs.imgs, 
-    mask= read_masks.masks)[""]
-    transformed_3 = transform(imgs=read_imgs.imgs, 
-    mask= read_masks.masks)[""]
+    # for i in range (3):
+    #     transform[i] = (
+    #         imgs_masks_transform(
+    #         imgs=read_imgs.imgs, 
+    #         mask= read_masks.masks)[""],
+    #         imgs_transform(
+    #         imgs=read_imgs.imgs, 
+    #         mask= read_masks.masks)[""]
+    #         )
+
+def main():
+    root = Path(r"E:\senkouka\data_dataset_voc\images")
+    output_path = Path(r"E:\senkouka\augmented_2")
+
+    if not output_path.exists():
+        output_path.mkdir(parents=True)
+
+    # imgs_transform_1 = A.Compose()
+    imgs_flip = A.Compose(
+        [A.HorizontalFlip(always_apply=False, p=0.5)]
+    )
+    imgs_bright = A.Compose(
+        [A.RandomBrightnessContrast(
+                        brightness_limit=0.23,
+                        contrast_limit=0.23,
+                        brightness_by_max=True,
+                        always_apply=False, p=0.5)
+        ]
+    )
+    imgs_transform = A.OneOf(
+            [A.Sequential([
+                    A.GaussianBlur(blur_limit=(3, 9),sigma_limit=0,p=0.5),
+                    A.GaussNoise(
+                        var_limit=(10, 100),    
+                        mean=0,
+                        per_channel=True,
+                        always_apply=False, p=0.5
+                )       
+            ])
+        ]
+    )
+    # imgs_fog = A.RandomFog(
+    #         fog_coef_lower=0.3, 
+    #         fog_coef_upper=0.9, 
+    #         alpha_coef=0.1, 
+    #         always_apply=False, p=0.5
+    # )
+
+    # print(root)
+    for file_path in (root.glob("*.jpg")):   
+        if file_path.is_dir():
+            continue
+        print(file_path)
+        img = cv2.imread(str(file_path))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+
+        # print(file_path.parent)
+        mask_path = file_path.parent.parent / f"segmentations/{file_path.stem}.png"
+        seg = cv2.imread(str(mask_path))
+        print(mask_path)
+
+        augmented = imgs_transform(image=img, mask=seg)
+        augmented_flip = imgs_flip(image=img, mask=seg)
+        augmented_bright = imgs_bright(image=img, mask=seg)
+            # imgs_noise(image=img, mask=seg),
+            # imgs_fog(image=img, mask=seg)
+
+        augmented_image = augmented['image']
+        augmented_image_flip = augmented_flip['image']
+        augmented_image_bright = augmented_bright['image']
+        augmented_mask = augmented['mask']
+        augmented_mask_flip = augmented_flip['mask']
+        augmented_mask_bright = augmented_bright['mask']
+
+        augmented_args = [
+            augmented_image,
+            augmented_image_flip,
+            augmented_image_bright,
+            augmented_mask,
+            augmented_mask_flip,
+            augmented_mask_bright]
+        
+        cv2.imwrite(
+            str(output_path / f"{file_path.stem}_augmented.jpg"), 
+            augmented_image
+            )
+        cv2.imwrite(
+            str(output_path / f"{file_path.stem}_augmented_flip.jpg"), 
+            augmented_image_flip
+            ) 
+        cv2.imwrite(
+            str(output_path / f"{file_path.stem}_augmented_bright.jpg"), 
+            augmented_image_bright
+            )    
+        cv2.imwrite(
+            str(output_path / f"{file_path.stem}_augmented.png"), 
+            augmented_mask
+            )
+        cv2.imwrite(
+            str(output_path / f"{file_path.stem}_augmented_flip.png"), 
+            augmented_mask_flip
+            )
+        cv2.imwrite(
+            str(output_path / f"{file_path.stem}_augmented_bright.png"), 
+            augmented_mask_bright
+            )
+        # seg = cv2.cvtColor(seg, cv2.COLOR_BGR2RGBA)
+
+
+
+    # imgs = cv2.imread("")
+    # imgs = cv2.cvtColor(imgs, cv2.COLOR_BGR2RGBA)
+    # img_transform()
+
+
+if __name__ == "__main__":
+    main()
 
