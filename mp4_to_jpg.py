@@ -5,6 +5,7 @@ import numpy as np
 from datetime import datetime
 import glob
 import sys
+from pathlib import Path
 #from (root directory) import (py file)
 from tqdm import tqdm
 #from utils import load_pth_file
@@ -24,13 +25,7 @@ def save_frames_range_sec(
     os.makedirs(dir_path, exist_ok=True)
     base_path = os.path.join(dir_path, basename)
 
-    digit = len(str
-                    (int
-                        (cap.get
-                        (cv2.CAP_PROP_FRAME_COUNT)
-                        )
-                    )
-                )
+    digit = len(str(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))))
 
     fps = cap.get(cv2.CAP_PROP_FPS)
     fps_inv = 1 / fps
@@ -59,7 +54,43 @@ def save_frames_range_sec(
                 ),
                 cap_img_resize,
             )
-        sec += step_sec 
+        sec += ( step_sec * 30 ) 
+
+def save_all_frames(
+    video_path, 
+    dir_path, 
+    basename, 
+    ext='jpg'):
+    cap = cv2.VideoCapture(video_path)
+
+    if not cap.isOpened():
+        return
+
+    os.makedirs(dir_path, exist_ok=True)
+    base_path = os.path.join(dir_path, basename)
+
+    digit = len(str(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))))
+
+    n = 0
+
+    while True:
+        ret, frame = cap.read()
+        if ret:
+            cap_img_resize = cv2.resize(
+                frame, 
+                dsize=(1920, 1080) , 
+                fx=0, fy=0, 
+                interpolation=cv2.INTER_AREA
+                )
+            cv2.imwrite(
+                '{}_{}.{}'.format(
+                    base_path, 
+                    str(n).zfill(digit), 
+                    ext), 
+                cap_img_resize)
+            n += 1
+        else:
+            return
 
 #リサイズされたことを確認する
 # print(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -171,37 +202,35 @@ def save_frames_range_sec(
 #    cv2.destroyWindow(window_name_2)
 
 def main():
-    global vid_path, dir_path, basename, filename
-    vid_path = "E:/senkouka/drone_flight_0967.MP4"
-    dir_path = "E:/senkouka/result_4"
+    root = Path(r"E:/senkouka/drone_video")
+    dir_path = Path(r"E:/senkouka/drone_imgs")
     basename = "sample_video_img"
-    filename = "E:/senkouka/result_4/jpg_to_video.mp4"
 
     if not dir_path.exists():
         dir_path.mkdir(parents=True)
 
-    save_frames_range_sec(
-        vid_path,
-        38,
-        96,
-        1,
-        dir_path,
-        basename,
-    )
+    for file_path in (root.glob(".mp4")):
+        if file_path.is_dir():
+            continue
+        save_all_frames(file_path, dir_path, basename)
 
-    save_frames_range_sec(
-        vid_path,
-        102,
-        103,
-        1,
-        dir_path,
-        basename,
-    )
+    # save_frames_range_sec(
+    #     vid_path,
+    #     38,
+    #     96,
+    #     1,
+    #     dir_path,
+    #     basename,
+    # )
 
-#    jpg_to_mp4(dir_path, 
-#                filename)
-
-#    show_mp4(filename)
+    # save_frames_range_sec(
+    #     vid_path,
+    #     102,
+    #     103,
+    #     1,
+    #     dir_path,
+    #     basename,
+    # )
 
 #　【必須】メインの関数を実行するために
 if __name__ == "__main__":
