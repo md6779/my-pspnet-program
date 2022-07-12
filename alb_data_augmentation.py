@@ -21,26 +21,43 @@ def main():
     # imgs_transform_1 = A.Compose()
     flip = A.HorizontalFlip(always_apply=False, p=0.5)
     brightness_contrast = A.RandomBrightnessContrast(
-                        brightness_limit=0.25,
-                        contrast_limit=0.25,
-                        brightness_by_max=True,
-                        always_apply=False, p=0.5
-                        )
+                            brightness_limit=0.25,
+                            contrast_limit=0.25,
+                            brightness_by_max=True,
+                            always_apply=False, p=0.5
+                            )
+    color = A.ColorJitter(
+                brightness=0.2, 
+                contrast=0.2, 
+                saturation=0.2, 
+                hue=0.2, 
+                always_apply=False, 
+                p=0.5
+                )
     sharp = A.Sharpen(
             alpha=(0.2, 0.5), 
             lightness=(0.45, 1.0), 
             always_apply=False, p=0.5)
+    adv_blur = A.AdvancedBlur(
+                blur_limit=(3, 7), 
+                sigmaX_limit=(0.2, 1.0), 
+                sigmaY_limit=(0.2, 1.0), 
+                rotate_limit=90, 
+                beta_limit=(0.5, 8.0), 
+                noise_limit=(0.9, 1.1), 
+                always_apply=False, p=0.5
+                ) 
     gauss_blur = A.GaussianBlur(
-            blur_limit=(3, 9),
-            sigma_limit=0,
-            always_apply=False, p=0.5
-            )
+                blur_limit=(3, 9),
+                sigma_limit=0,
+                always_apply=False, p=0.5
+                )
     gauss_noise = A.GaussNoise(
-            var_limit=(10, 100),    
-            mean=0,
-            per_channel=True,
-            always_apply=False, p=0.5
-            )     
+                var_limit=(10, 100),    
+                mean=0,
+                per_channel=True,
+                always_apply=False, p=0.5
+                )     
 
     for file_path in (root.glob("*.jpg")):   
         if file_path.is_dir():
@@ -58,32 +75,42 @@ def main():
         augmented_bright = brightness_contrast(
                             image=img, mask=seg
                         )
+        augmented_color = color(image=img, mask=seg)
+        augmented_adv_blur = adv_blur(image=img, mask=seg)
         augmented_blur = gauss_blur(image=img, mask=seg)
         augmented_noise = gauss_noise(image=img, mask=seg)
         augmented_sharp = sharp(image=img, mask=seg)
 
         augmented_image_flip = augmented_flip['image']
         augmented_image_bright = augmented_bright['image']
+        augmented_image_color = augmented_color['image']
         augmented_image_blur = augmented_blur ['image']
+        augmented_image_adv_blur = augmented_adv_blur['image']
         augmented_image_noise = augmented_noise['image']
         augmented_image_sharp = augmented_sharp['image']
         augmented_mask_flip = augmented_flip['mask']
         augmented_mask_bright = augmented_bright['mask']
+        augmented_mask_color = augmented_color['mask']
         augmented_mask_blur = augmented_blur['mask']
+        augmented_mask_adv_blur = augmented_adv_blur['mask']
         augmented_mask_noise = augmented_noise['mask']
         augmented_mask_sharp = augmented_sharp['mask']
 
         augmented_image_list = [
             augmented_image_flip,
             augmented_image_bright,
+            augmented_image_color,
             augmented_image_blur,
+            augmented_image_adv_blur,
             augmented_image_noise,
             augmented_image_sharp
         ]
         augmented_mask_list = [
             augmented_mask_flip,
             augmented_mask_bright,
+            augmented_mask_color,
             augmented_mask_blur, 
+            augmented_mask_adv_blur,
             augmented_mask_noise,
             augmented_mask_sharp,
         ]

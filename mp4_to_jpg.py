@@ -206,32 +206,32 @@ def main():
     dir_path = Path(r"E:/senkouka/drone_imgs")
     basename = "sample_video_img"
 
-    if not dir_path.exists():
-        dir_path.mkdir(parents=True)
+    # if not dir_path.exists():
+        # dir_path.mkdir(parents=True)
 
-    for file_path in (root.glob(".mp4")):
-        if file_path.is_dir():
-            continue
-        print(file_path)
-        save_all_frames(file_path, dir_path, basename)
+    # for file_path in (root.glob(".mp4")):
+        # if file_path.is_dir():
+            # continue
+        # print(file_path)
+        # save_all_frames(file_path, dir_path, basename)
 
-    # save_frames_range_sec(
-    #     vid_path,
-    #     38,
-    #     96,
-    #     1,
-    #     dir_path,
-    #     basename,
-    # )
+    save_frames_range_sec(
+        root,
+        38,
+        96,
+        1,
+        dir_path,
+        basename,
+    )
 
-    # save_frames_range_sec(
-    #     vid_path,
-    #     102,
-    #     103,
-    #     1,
-    #     dir_path,
-    #     basename,
-    # )
+    save_frames_range_sec(
+        root,
+        102,
+        103,
+        1,
+        dir_path,
+        basename,
+    )
 
 #　【必須】メインの関数を実行するために
 if __name__ == "__main__":
