@@ -202,7 +202,7 @@ def save_all_frames(
 #    cv2.destroyWindow(window_name_2)
 
 def main():
-    root = Path(r"E:/senkouka/drone_video")
+    # root = Path(r"E:/senkouka/drone_video")
     dir_path = Path(r"E:/senkouka/drone_imgs")
     basename = "sample_video_img"
 
@@ -216,7 +216,7 @@ def main():
         # save_all_frames(file_path, dir_path, basename)
 
     save_frames_range_sec(
-        root,
+        "E:/senkouka/drone_video",
         38,
         96,
         1,
@@ -225,7 +225,7 @@ def main():
     )
 
     save_frames_range_sec(
-        root,
+        "E:/senkouka/drone_video",
         102,
         103,
         1,
@@ -233,6 +233,24 @@ def main():
         basename,
     )
 
+    save_frames_range_sec(
+        "E:/senkouka/drone_video",
+        102,
+        103,
+        1,
+        dir_path,
+        basename,
+    )
+
+    save_frames_range_sec(
+        "E:/senkouka/drone_video",
+        102,
+        103,
+        1,
+        dir_path,
+        basename,
+    )
+    
 #　【必須】メインの関数を実行するために
 if __name__ == "__main__":
     main()
