@@ -32,72 +32,99 @@ def save_frames_range_sec(
 
     sec = start_sec
 
-    n_steps = (stop_sec - start_sec) // step_sec
-    tmp_ = [None] * n_steps
+    # n_steps = (stop_sec - start_sec) // step_sec
+    # pbar = tqdm(range(n_steps))
 
-    pbar = tqdm(tmp_, total=n_steps)
-    for _ in pbar:
-        n = round(fps * sec)
-        cap.set(cv2.CAP_PROP_POS_FRAMES, n)
-        ret, frame = cap.read()
-        if ret:
-            cap_img_resize = cv2.resize(
-                            frame, 
-                            dsize=(1920, 1080), 
-                            fx=0, fy=0, 
-                            interpolation=cv2.INTER_AREA
-                            )
-            cv2.imwrite(
-                "{}_{}_{:.2f}.{}".format(
-                    base_path, 
-                    str(n).zfill(digit), 
-                    n * fps_inv, 
-                    ext
-                ),
-                cap_img_resize,
-            )
-        sec += ( step_sec * 30 ) 
+    # print(video_path)
+    # for _ in pbar:
+    #     n = round(fps * sec)
+    #     cap.set(cv2.CAP_PROP_POS_FRAMES, n)
+    #     ret, frame = cap.read()
+    #     if ret:
+    #         cap_img_resize = cv2.resize(
+    #                         frame, 
+    #                         dsize=(1920, 1080), 
+    #                         fx=0, fy=0, 
+    #                         interpolation=cv2.INTER_AREA
+    #                         )
+    #         cv2.imwrite(
+    #             "{}_{}_{:.2f}.{}".format(
+    #                 base_path, 
+    #                 str(n).zfill(digit), 
+    #                 n * fps_inv, 
+    #                 ext
+    #             ),
+    #             cap_img_resize,
+    #         )
+    #         n += 1
+    # sec += step_sec 
+
+    print(video_path)
+
+    while fps < 30:
+        while sec < stop_sec:
+            n = round(fps * sec)
+            cap.set(cv2.CAP_PROP_POS_FRAMES, n)
+            ret, frame = cap.read()
+            if ret:
+                cap_img_resize = cv2.resize(
+                                frame, 
+                                dsize=(1920, 1080), 
+                                fx=0, fy=0, 
+                                interpolation=cv2.INTER_AREA
+                                )
+                cv2.imwrite(
+                    '{}_{}_{:.2f}.{}'.format(
+                        base_path, 
+                        str(n).zfill(digit), 
+                        n * fps_inv, ext
+                    ),
+                    cap_img_resize
+                )
+            sec += step_sec
 
 def main():
     # root = Path(r"E:/senkouka/drone_video")
-    dir_path = "D:/senkouka/drone_imgs"
+    dir_path = "D:/senkouka/drone_imgs_30fps_1"
     basename = "drone_img"
+    step = 1
 
     save_frames_range_sec(
-        "D:/senkouka/drone_video/drone_flight_0967",
+        "D:/senkouka/drone_video/drone_flight_0967.MP4",
         38,
         96,
-        1,
+        step,
         dir_path,
         basename,
     )
 
     save_frames_range_sec(
-        "D:/senkouka/drone_video/drone_flight_0967",
+        "D:/senkouka/drone_video/drone_flight_0967.MP4",
         102,
         103,
-        1,
+        step,
         dir_path,
         basename,
     )
 
     save_frames_range_sec(
-        "D:/senkouka/drone_video/DJI_0048",
+        "D:/senkouka/drone_video/DJI_0048.MP4",
         0,
         232,
-        1,
+        step,
         dir_path,
         basename,
     )
 
     save_frames_range_sec(
-        "D:/senkouka/drone_video/DJI_0062",
+        "D:/senkouka/drone_video/DJI_0062.MP4",
         0,
         125,
-        1,
+        step,
         dir_path,
         basename,
     )
+
 
 #　【必須】メインの関数を実行するために
 if __name__ == "__main__":
