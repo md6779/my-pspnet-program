@@ -212,6 +212,7 @@ def main():
     for file_path in (root.glob(".mp4")):
         if file_path.is_dir():
             continue
+        print(file_path)
         save_all_frames(file_path, dir_path, basename)
 
     # save_frames_range_sec(
