@@ -126,13 +126,13 @@ def main():
                     ),
         grayscale = A.ToGray(p = 1.0),
         invert = A.InvertImg(p = 1.0),
+    # SnP
         snp_noise = noisy("s&p", noise_img),
         poisson = noisy("poisson", noise_img)
     )
     
     #BPF(船，雲，波，ゴミ)
     #白だけ残すフィルタ
-    # SnP
     #Invert
 
     for file_path in (root.glob("*.jpg")):   
