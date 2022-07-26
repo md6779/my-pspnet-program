@@ -1,5 +1,5 @@
-from typing import Any, Iterable, dict, tuple, list, get_type_hints
-from regex import P
+import typing
+from typing import Any, Iterable
 import numpy as np 
 import cv2
 from torchvision.utils import save_image
@@ -22,20 +22,20 @@ def transform_img(transform, img, mask):
 
 def get_transformed_properties(
     transformed_data: dict[str, Any]
-) -> tuple[Any, list[Iterable[float]], list[int]]:
+) -> typing.tuple[Any, typing.list[Iterable[float]], typing.list[int]]:
     return transformed_data["image"], transformed_data["mask"]
 
-def get_transform_options(transform_data: dict[str, Any]) -> dict:
+def get_transform_options(transform_data: typing.dict[str, Any]) -> dict:
     return {
         "image": transform_data["image"],
         "mask": transform_data["mask"],
     }
 
-def get_compose(transforms_dict: dict[str, list]) -> Iterable[tuple[str, A.Compose]]:
+def get_compose(transforms_dict: typing.dict[str, typing.list]) -> Iterable[typing.tuple[str, A.Compose]]:
     for key, transform in transforms_dict.items():
         yield key, A.Compose(transform)
 
-def save_process(transformed_data: dict[str, Any], save_root: Path, stem: str) -> None:
+def save_process(transformed_data: typing.dict[str, Any], save_root: Path, stem: str) -> None:
     tfd_img, tfd_mask = get_transformed_properties(transformed_data)
     # img = transformed_data["imaga"]
     # mask = transformed_data["mask"]
@@ -73,23 +73,28 @@ def noisy(noise_typ,image):
         return noisy
 
 def noise_img():
+    root = Path(r"E:\senkouka\test_imgs\images")
+    output_path = Path(r"E:\senkouka\test_augmented_8")
     
+    if not output_path.exists():
+        output_path.mkdir(parents=True)
+
     # salt-and-pepper noise can
     # be applied only to grayscale images
     # Reading the color image in grayscale image
     img = cv2.imread('img', cv2.IMREAD_GRAYSCALE)
 
     #Storing the image
-    cv2.imwrite('snp_img', noisy(img))
+    cv2.imwrite(f'{output_path}_snp_img', noisy(img))
 
 def main():
-    root = Path(r"D:\senkouka\test_imgs\images")
-    output_path = Path(r"D:\senkouka\test_augmented_8")
+    root = Path(r"E:\senkouka\test_imgs\images")
+    output_path = Path(r"E:\senkouka\test_augmented_8")
 
     if not output_path.exists():
         output_path.mkdir(parents=True)
 
-    transforms_dict: OD[str, list] = OD(
+    transforms_dict: OD[str, typing.list] = OD(
         flip = A.HorizontalFlip(always_apply=False, p=1.0),
         brightness_contrast = A.RandomBrightnessContrast(
                                 brightness_limit=0.25,
@@ -140,8 +145,6 @@ def main():
             continue
         print(file_path)
         img = cv2.imread(str(file_path))
-        img_red = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img_color_list = [img, img_red]
 
         # print(file_path.parent)
         mask_path = file_path.parent.parent / f"segmentations/{file_path.stem}.png"
@@ -155,73 +158,11 @@ def main():
         for key, transforms in get_compose(transforms_dict):
             base_transformed = transforms(get_transformed_properties(base_transform_data))
 
-        for imgs in img_color_list:
-            augmented_bright = brightness_contrast(
-                                image=imgs, mask=seg
-                            )
-            augmented_adv_blur = adv_blur(image=imgs, mask=seg)
-            augmented_blur = gauss_blur(image=imgs, mask=seg)
-            augmented_noise = gauss_noise(image=imgs, mask=seg)
-            augmented_sharp = sharp(image=imgs, mask=seg)
-            augmented_flip = flip(image=imgs, mask=seg)
-            augmented_gray = grayscale(image=imgs, mask=seg)
-
-
-        # augmented_image_bright = augmented_bright['image']
-        # augmented_image_blur = augmented_blur ['image']
-        # augmented_image_adv_blur = augmented_adv_blur['image']
-        # augmented_image_noise = augmented_noise['image']
-        # augmented_image_sharp = augmented_sharp['image']
-        # augmented_image_flip = augmented_flip['image']
-        # augmented_image_gray = augmented_gray['image']
-        # augmented_mask_bright = augmented_bright['mask']
-        # augmented_mask_blur = augmented_blur['mask']
-        # augmented_mask_adv_blur = augmented_adv_blur['mask']
-        # augmented_mask_noise = augmented_noise['mask']
-        # augmented_mask_sharp = augmented_sharp['mask']
-        # augmented_mask_flip = augmented_flip['mask']
-        # augmented_mask_gray = augmented_gray['mask']
-
-        augmented_image_list = [
-            augmented_image_bright,
-            augmented_image_blur,
-            augmented_image_adv_blur,
-            augmented_image_noise,
-            augmented_image_sharp,
-            augmented_image_flip,
-            augmented_image_gray
-        ]
-        augmented_mask_list = [
-            augmented_mask_bright,
-            augmented_mask_blur, 
-            augmented_mask_adv_blur,
-            augmented_mask_noise,
-            augmented_mask_sharp,
-            augmented_mask_flip,
-            augmented_mask_gray
-        ]
-
-        for i, (AugImg , AugMask) in enumerate(
-            zip(
-                augmented_image_list, 
-                augmented_mask_list
-                ), 1):
-            cv2.imwrite(
-                str(output_path / f"{file_path.stem}.jpg"),
-                img
-            )
-            cv2.imwrite(
-                str(output_path / f"{file_path.stem}_augmented_{i}.jpg"), 
-                AugImg
-            )
-            cv2.imwrite(
-                str(output_path / f"{file_path.stem}.png"),
-                seg
-            )
-            cv2.imwrite(
-                str(output_path / f"{file_path.stem}_augmented_mask_{i}.png"), 
-                AugMask
-            )
+            save_process(
+                        base_transformed,   
+                        save_root=output_path, 
+                        stem=f"{file_path.stem}_augmented_{key}"
+                        )
 
 if __name__ == "__main__":
     main()

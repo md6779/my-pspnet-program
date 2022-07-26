@@ -11,7 +11,6 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 
-
 @dataclass
 class BBoxFormatConversion:
     """Convert format between 'albumentations' and 'yolo'."""
