@@ -21,7 +21,7 @@ def transform_img(transform, img, mask):
     return transform(image=img, mask=mask)
 
 def get_transformed_properties(
-    transformed_data: dict[str, Any]
+    transformed_data: typing.dict[str, Any]
 ) -> typing.tuple[Any, typing.list[Iterable[float]], typing.list[int]]:
     return transformed_data["image"], transformed_data["mask"]
 
